@@ -16,6 +16,8 @@ Each player has as collaborator objects the cards in their hand. The calculation
 
 Modeling the real-world, the `Participant` uses his/her brain to decide whether to hit or stay. Therefore, this logic should be located in the `Participant` class. However, the `Player` and `Dealer` have different logic. The `Player`'s choices are determined by the user, while the `Dealer` will always follow the same logic. Therefore, a predicate instance method `should_hit?` can be implemented in the subclasses `Player` and `Dealer` instead of in the superclass `Participant`. This is an example of polymorphism, where the `Game` orchestrator can invoke `should_hit?` on the player or dealer, and each will respond to it in a different way. The subsequent act of hitting or staying is common to both the player and dealer and can therefore be implemented in the `Participant` superclass.
 
+
+
 ## Class Responsibility Collaborator (CRC) Cards
 
 Only list *public* methods callable from outside the class. Do not list implementation details, e.g. private instance methods.

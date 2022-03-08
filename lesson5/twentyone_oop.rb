@@ -14,12 +14,16 @@ module Hand
     @hand.push(card)
   end
 
-  def display_hand(reveal_dealer: false)
+  def display_hand(hide_dealer_card: false)
     cards = @hand.map do |card|
       format("%2s%s", card.rank, SUIT_SYMBOLS[card.suit])
     end
-    puts cards.join(' ')
-    puts "Total: #{hand_value}"
+    if hide_dealer_card
+      puts (cards[0...-1] + ["???"]).join(' ')
+    else
+      print cards.join(' ')
+      puts " (Total: #{hand_value})"
+    end
   end
 
   def reset
@@ -112,7 +116,7 @@ class Dealer < Participant
     hand_value <17
   end
 
-  def display_hand
+  def display_hand(hide_dealer_card: true)
     print "Dealer hand:"
     super
   end
@@ -126,7 +130,7 @@ class Game
   end
   
   def play
-    # display_welcome_message
+    display_welcome_message
 
     loop do
       deal_initial_cards
@@ -138,12 +142,33 @@ class Game
       reset_cards
     end
 
-    # display_goodbye_message
+    display_goodbye_message
   end
 
   private
 
   attr_reader :player, :dealer
+  
+  def display_welcome_message
+    system "clear"
+    puts <<~RULES
+      Welcome to Twenty-One!
+      Rules of the Game:
+      - You and the dealer will each be dealt 2 cards.
+      - You play first, and then the dealer will play.
+      - You can choose to hit (draw) or stay (don't draw).
+      - The hand value is the sum of all card values. Aces can be worth 1 or 11. 
+      - A player busts and loses the game if their hand value exceeds 21.
+      - The greater hand value wins if neither player busts.
+    
+      Press Enter to start the game!
+    RULES
+    gets
+  end
+  
+  def display_goodbye_message
+    puts "Thank you for playing Twenty-One. Goodbye!"
+  end
 
   def deal_card(participant)
     participant.add_card(@deck.draw)
@@ -156,9 +181,12 @@ class Game
     end
   end
 
-  def display_hands
+  def display_hands(hide_dealer_card: true)
+    system "clear"
+    puts '-' * 50
     player.display_hand
-    dealer.display_hand
+    dealer.display_hand(hide_dealer_card: hide_dealer_card)
+    puts '-' * 50
   end
 
   def player_turn
@@ -171,8 +199,14 @@ class Game
 
   def dealer_turn
     loop do
-      dealer.should_hit? ? deal_card(dealer) : break
-      display_hands
+      if dealer.should_hit?
+        deal_card(dealer)
+        puts "Dealer hit."
+      else
+        puts "Dealer stayed."
+        break
+      end
+      display_hands(hide_dealer_card: false)
       break if dealer.busted?
     end
   end
