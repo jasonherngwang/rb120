@@ -1,14 +1,22 @@
 class Customer
   def initialize(name)
     @name = name
+    @order = nil
   end
 
   def place_order
     @order = Order.new
+    review_order
   end
 
   def order_cost
     @order.total
+  end
+  
+  def review_order
+    print "You've selected: "
+    puts @order
+    puts "Your total is: #{order_cost}"
   end
 end
 
@@ -28,7 +36,7 @@ class Order
   end
 
   def total
-    total_cost = @burger.cost + @side.cost + @drink.cost
+    total_cost = meal.map(&:cost).reduce(:+)#@burger.cost + @side.cost + @drink.cost
     format("$%.2f", total_cost) # #format formats the cost to two decimal places
   end
 end
@@ -88,5 +96,3 @@ end
 
 jason = Customer.new('Jason')
 jason.place_order
-p jason.order_cost
-p jason
